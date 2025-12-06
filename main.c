@@ -33,6 +33,11 @@ void sauvegarderSalles() {
     FILE *f = fopen("salles.txt", "w");
     int i;
 
+    if (!f) {
+        printf("Erreur : impossible d'ouvrir salles.txt en ecriture.\n");
+        return;
+    }
+
     for (i = 0; i < nbSalles; i++) {
         fprintf(f, "%s;%d;%.2f;%s\n",
                 salles[i].nom,
@@ -45,6 +50,12 @@ void sauvegarderSalles() {
 
 void chargerSalles() {
     FILE *f = fopen("salles.txt", "r");
+
+    if (!f) {
+        // Fichier inexistant : aucune salle
+        nbSalles = 0;
+        return;
+    }
 
     nbSalles = 0;
     while (nbSalles < MAX_SALLES &&
@@ -61,6 +72,11 @@ void chargerSalles() {
 void sauvegarderReservations() {
     FILE *f = fopen("reservations.txt", "w");
     int i;
+
+    if (!f) {
+        printf("Erreur : impossible d'ouvrir reservations.txt en ecriture.\n");
+        return;
+    }
 
     for (i = 0; i < nbReservations; i++) {
         fprintf(f, "%d;%s;%d;%s;%d;%d;%d;%.2f;%d\n",
@@ -79,6 +95,12 @@ void sauvegarderReservations() {
 
 void chargerReservations() {
     FILE *f = fopen("reservations.txt", "r");
+
+    if (!f) {
+        // Fichier inexistant : aucune réservation
+        nbReservations = 0;
+        return;
+    }
 
     nbReservations = 0;
     while (nbReservations < MAX_RESERVATIONS &&
@@ -155,19 +177,16 @@ void ajouterSalle() {
 void afficherSalles() {
     int i;
     printf("=== Liste des salles ===\n");
-    if (!f)
-    {
-        printf("aucune salle à afficher");
-    }        
-    else
-    {
-        for (i = 0; i < nbSalles; i++) {
-                printf("%d) %s, capacite=%d, tarif=%.2f, equipements=%s\n",
-               i+1, salles[i].nom, salles[i].capacite,
-               salles[i].tarif_horaire, salles[i].equipements);
-        }
+    if (nbSalles == 0) {
+        printf("Aucune salle a afficher.\n");
+        return;
     }
-    
+
+    for (i = 0; i < nbSalles; i++) {
+        printf("%d) %s, capacite=%d, tarif=%.2f, equipements=%s\n",
+               i + 1, salles[i].nom, salles[i].capacite,
+               salles[i].tarif_horaire, salles[i].equipements);
+    }
 }
 
 void ajouterReservation() {
@@ -323,6 +342,7 @@ void afficherReservations() {
                reservations[i].statut);
     }
 }
+
 void supprimerSalle() {
     if (nbSalles == 0) {
         printf("Aucune salle a supprimer.\n");
@@ -341,20 +361,17 @@ void supprimerSalle() {
         return;
     }
 
-    // Supprimer toutes les reservations liees a cette salle
     for (int i = 0; i < nbReservations; i++) {
         if (reservations[i].index_salle == index) {
             reservations[i].statut = 2; // annulee
         }
     }
 
-    // Deplacement des salles
     for (int i = index; i < nbSalles - 1; i++) {
         salles[i] = salles[i + 1];
     }
     nbSalles--;
 
-    // Correction des index dans les reservations restantes
     for (int i = 0; i < nbReservations; i++) {
         if (reservations[i].index_salle > index) {
             reservations[i].index_salle--;
@@ -365,6 +382,7 @@ void supprimerSalle() {
 
     sauvegarderDansFichiers();
 }
+
 void supprimerReservation() {
     if (nbReservations == 0) {
         printf("Aucune reservation a supprimer.\n");
@@ -390,7 +408,6 @@ void supprimerReservation() {
         return;
     }
 
-    // Décalage
     for (int i = index; i < nbReservations - 1; i++) {
         reservations[i] = reservations[i + 1];
     }
@@ -400,6 +417,7 @@ void supprimerReservation() {
 
     sauvegarderDansFichiers();
 }
+
 void afficherMenu() {
     printf("\n=== MENU ===\n");
     printf("1. Ajouter une salle\n");
@@ -454,7 +472,7 @@ int main() {
             break;
         case 9:
             supprimerReservation();
-            break;    
+            break;
         case 0:
             printf("Au revoir.\n");
             break;

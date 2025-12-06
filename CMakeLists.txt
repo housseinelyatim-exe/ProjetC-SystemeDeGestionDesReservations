@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 4.0)
-project(ProjetC_SystemeDeGestionDesReservations C)
-
+cmake_minimum_required(VERSION 3.20)
+project(gestion_salles)
 set(CMAKE_C_STANDARD 11)
-
-add_executable(ProjetC_SystemeDeGestionDesReservations main.c)
+add_executable(gestion_salles main.c)
