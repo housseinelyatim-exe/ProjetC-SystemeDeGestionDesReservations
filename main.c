@@ -323,7 +323,83 @@ void afficherReservations() {
                reservations[i].statut);
     }
 }
+void supprimerSalle() {
+    if (nbSalles == 0) {
+        printf("Aucune salle a supprimer.\n");
+        return;
+    }
 
+    afficherSalles();
+    printf("Indice de la salle a supprimer (1 a %d) : ", nbSalles);
+
+    int index;
+    scanf("%d", &index);
+    index--;
+
+    if (index < 0 || index >= nbSalles) {
+        printf("Indice invalide.\n");
+        return;
+    }
+
+    // Supprimer toutes les reservations liees a cette salle
+    for (int i = 0; i < nbReservations; i++) {
+        if (reservations[i].index_salle == index) {
+            reservations[i].statut = 2; // annulee
+        }
+    }
+
+    // Deplacement des salles
+    for (int i = index; i < nbSalles - 1; i++) {
+        salles[i] = salles[i + 1];
+    }
+    nbSalles--;
+
+    // Correction des index dans les reservations restantes
+    for (int i = 0; i < nbReservations; i++) {
+        if (reservations[i].index_salle > index) {
+            reservations[i].index_salle--;
+        }
+    }
+
+    printf("Salle supprimee.\n");
+
+    sauvegarderDansFichiers();
+}
+void supprimerReservation() {
+    if (nbReservations == 0) {
+        printf("Aucune reservation a supprimer.\n");
+        return;
+    }
+
+    afficherReservations();
+    printf("ID de la reservation a supprimer : ");
+
+    int id;
+    scanf("%d", &id);
+
+    int index = -1;
+    for (int i = 0; i < nbReservations; i++) {
+        if (reservations[i].id == id) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1) {
+        printf("Reservation non trouvee.\n");
+        return;
+    }
+
+    // Décalage
+    for (int i = index; i < nbReservations - 1; i++) {
+        reservations[i] = reservations[i + 1];
+    }
+    nbReservations--;
+
+    printf("Reservation supprimee.\n");
+
+    sauvegarderDansFichiers();
+}
 void afficherMenu() {
     printf("\n=== MENU ===\n");
     printf("1. Ajouter une salle\n");
@@ -333,6 +409,8 @@ void afficherMenu() {
     printf("5. Chiffre d'affaires par salle\n");
     printf("6. Reservations par mois\n");
     printf("7. Salles les plus populaires\n");
+    printf("8. Supprimer une salle\n");
+    printf("9. Supprimer une reservation\n");
     printf("0. Quitter\n");
     printf("Choix : ");
 }
@@ -371,6 +449,12 @@ int main() {
         case 7:
             afficherSallesLesPlusPopulaires();
             break;
+        case 8:
+            supprimerSalle();
+            break;
+        case 9:
+            supprimerReservation();
+            break;    
         case 0:
             printf("Au revoir.\n");
             break;
