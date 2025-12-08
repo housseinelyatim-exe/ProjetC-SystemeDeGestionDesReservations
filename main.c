@@ -69,6 +69,40 @@ void chargerSalles() {
     fclose(f);
 }
 
+void sauvegarderTarifs()
+{
+    FILE *f = fopen("tarifs.txt", "w");
+    if (!f) {
+        printf("Erreur ouverture fichier tarifs.\n");
+        return;
+    }
+
+    for (int i = 0; i < nbSalles; i++) {
+        fprintf(f, "%s;%.2f\n", salles[i].nom, salles[i].tarif_horaire);
+    }
+
+    fclose(f);
+}
+
+void chargerTarifs() {
+    FILE *f = fopen("tarifs.txt", "r");
+    if (!f) return;
+
+    char nom[50];
+    float tarif;
+    while (fscanf(f, "%49[^;];%f\n", nom, &tarif) == 2) {
+        for (int i = 0; i < nbSalles; i++) {
+            if (strcmp(salles[i].nom, nom) == 0) {
+                salles[i].tarif_horaire = tarif;
+            }
+        }
+    }
+    fclose(f);
+}
+
+
+
+
 void sauvegarderReservations() {
     FILE *f = fopen("reservations.txt", "w");
     int i;
@@ -122,6 +156,7 @@ void chargerReservations() {
 void chargerDepuisFichiers() {
     chargerSalles();
     chargerReservations();
+    chargerTarifs();
 }
 
 void sauvegarderDansFichiers() {
@@ -256,6 +291,8 @@ void ajouterReservation() {
     sauvegarderDansFichiers();
 }
 
+//AFFICHAGE
+
 int extraireMois(const char *date) {
     int mois = (date[3] - '0') * 10 + (date[4] - '0');
     return mois;
@@ -343,6 +380,8 @@ void afficherReservations() {
     }
 }
 
+//SUPPRIMER SALLE
+
 void supprimerSalle() {
     if (nbSalles == 0) {
         printf("Aucune salle a supprimer.\n");
@@ -383,6 +422,8 @@ void supprimerSalle() {
     sauvegarderDansFichiers();
 }
 
+//SUPPRIMER RESERVATION
+
 void supprimerReservation() {
     if (nbReservations == 0) {
         printf("Aucune reservation a supprimer.\n");
@@ -418,6 +459,71 @@ void supprimerReservation() {
     sauvegarderDansFichiers();
 }
 
+//GENERATION DE FACTURE
+
+void genererFacture(int idReservation) {
+    Reservation *r = NULL;
+
+    for (int i = 0; i < nbReservations; i++) {
+        if (reservations[i].id == idReservation) {
+            r = &reservations[i];
+            break;
+        }
+    }
+
+    if (!r) {
+        printf("Reservation introuvable.\n");
+        return;
+    }
+
+    char nomFichier[100];
+    sprintf(nomFichier, "facture_%d.txt", r->id);
+
+    FILE *f = fopen(nomFichier, "w");
+    if (!f) {
+        printf("Erreur creation facture.\n");
+        return;
+    }
+
+    int duree = r->heure_fin - r->heure_debut;
+
+    fprintf(f,
+            "====== FACTURE ======\n"
+            "Client : %s\n"
+            "Salle  : %s\n"
+            "Date   : %s\n"
+            "Heure  : %dh - %dh\n"
+            "Duree  : %d heures\n"
+            "Montant : %.2f DT\n",
+            r->nom_client,
+            salles[r->index_salle].nom,
+            r->date,
+            r->heure_debut,
+            r->heure_fin,
+            duree,
+            r->tarif
+    );
+    printf(
+            "====== FACTURE ======\n"
+            "Client : %s\n"
+            "Salle  : %s\n"
+            "Date   : %s\n"
+            "Heure  : %dh - %dh\n"
+            "Duree  : %d heures\n"
+            "Montant : %.2f DT\n",
+            r->nom_client,
+            salles[r->index_salle].nom,
+            r->date,
+            r->heure_debut,
+            r->heure_fin,
+            duree,
+            r->tarif
+    );
+    fclose(f);
+}
+
+//MENU
+
 void afficherMenu() {
     printf("\n=== MENU ===\n");
     printf("1. Ajouter une salle\n");
@@ -429,6 +535,7 @@ void afficherMenu() {
     printf("7. Salles les plus populaires\n");
     printf("8. Supprimer une salle\n");
     printf("9. Supprimer une reservation\n");
+    printf("10. Generer une facture\n");
     printf("0. Quitter\n");
     printf("Choix : ");
 }
@@ -475,6 +582,13 @@ int main() {
             break;
         case 0:
             printf("Au revoir.\n");
+            break;
+        case 10:
+            afficherReservations();
+            printf("ID de la reservation pour generer la facture : ");
+            int id;
+            scanf("%d", &id);
+            genererFacture(id);
             break;
         default:
             printf("Choix invalide.\n");
