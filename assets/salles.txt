@@ -4,7 +4,7 @@ Carthage;100;130.00;Scene,Sonorisation,Projecteur,Climatisation
 BullaRegia;35;65.00;TV,WiFi,Climatisation
 ElJem;90;120.00;Scene,Sonorisation,Climatisation
 Sbeitla;60;85.00;Projecteur,Sonorisation
-Kerkennah;30;60.00;TV,WiFi,Climatisation
+Kerkennah;30;700.00;TV,WiFi,Climatisation
 Hammamet;80;95.00;Projecteur,WiFi,Climatisation
 Kairouan;70;100.00;Projecteur,Sonorisation,WiFi
 AinDrahem;20;60.00;TV,WiFi

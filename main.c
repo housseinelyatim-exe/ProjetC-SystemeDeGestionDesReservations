@@ -365,7 +365,7 @@ void ajouterReservation() {
     Reservation r;
     int duree;
     printf("=== Nouvelle Reservation ===\n");
-    r.id = nbReservations + 1;
+    r.id = reservations[nbReservations-1].id + 1;
     printf("Nom du client : ");
     scanf(" %49s", r.nom_client);
     afficherSalles();
